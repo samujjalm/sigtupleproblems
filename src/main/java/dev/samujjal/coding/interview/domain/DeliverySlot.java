@@ -14,4 +14,7 @@ import java.time.LocalDateTime;
 public class DeliverySlot {
     private LocalDateTime startTime;
     private LocalDateTime endTime;
+    private int requestedUnits;
+    private Boolean slotAvailable;
+    private String medicineName;
 }
