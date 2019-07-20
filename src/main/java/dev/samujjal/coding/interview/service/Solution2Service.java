@@ -24,7 +24,6 @@ public class Solution2Service {
             log.info("Start slot (yyyy-MM-dd HH:mm): ");
             DeliverySlot deliverySlot = new DeliverySlot();
             deliverySlot.setStartTime(LocalDateTime.parse(in.nextLine(), dateFormat));
-            log.info("End slot (yyyy-MM-dd HH:mm): ");
             deliverySlot.setEndTime(deliverySlot.getStartTime().plusHours(2));
             log.info("Want to add another slot, press y for yes else n");
             response = in.nextLine().toCharArray()[0];
@@ -88,18 +87,20 @@ public class Solution2Service {
             medicines.sort(Comparator.comparing(Medicine::getAvailableDate));
         });
 
-        sortedDeliverySlots.forEach(deliverySlot -> setSlotAvalailibility(deliverySlot, medicineMap));
+        sortedDeliverySlots.forEach(deliverySlot -> setSlotAvailability(deliverySlot, medicineMap));
 
         sortedDeliverySlots.forEach(deliverySlot -> log.info("{}", deliverySlot));
     }
 
-    private void setSlotAvalailibility(DeliverySlot deliverySlot, Map<String, List<Medicine>> medicineMap) {
+    private void setSlotAvailability(DeliverySlot deliverySlot, Map<String, List<Medicine>> medicineMap) {
         List<Medicine> medicineList = medicineMap.get(deliverySlot.getMedicineName());
         medicineList.sort(Comparator.comparing(Medicine::getAvailableDate));
-        //TODO: apply binary search based for delivery slot against medicine slotstarttime
+        //TODO: apply binary search based for delivery slot start time against medicine availability time
         int tentativeStock = 0;
-        for (int i = 0; i < medicineList.size(); i++) {
-            Medicine medicine = medicineList.get(i);
+        for (Medicine medicine : medicineList) {
+            if(medicine.getAvailableDate().isAfter(deliverySlot.getEndTime())){
+                break;
+            }
             if (medicine.getStockUnits() > 0 && tentativeStock < deliverySlot.getRequestedUnits() &&
                     (deliverySlot.getStartTime().isEqual(medicine.getAvailableDate()) || deliverySlot.getStartTime().isAfter(medicine.getAvailableDate()))
 
